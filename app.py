@@ -58,13 +58,12 @@ import binanceWrapper
 
 if __name__ == "__main__":
     # do()
-    from tradingTest import utils
-    # testing.utils.getHistorial()
-    # print(60 * 60 * 1000)
-    startTime = utils.yearTime("2010")
-    print(startTime)
-    endTime = utils.dayMonthYearTime("1 jul 2021")
-    print(endTime)
-    hist = utils.getHistorial({"symbol" : "BTCUSDT", "interval" : "1h", "startTime" : startTime, "endTime" : endTime})
-    print(len(hist))
-    
+    from tradingTest import utils, technicalAnalisys as ta
+    hist = utils.getHistorial({"symbol" : "BTCUSDT", "interval" : "1h", "startTime" : utils.yearTime("2010"), "endTime" : utils.dayMonthYearTime("1 jul 2021")})
+    data = []
+    for x in range(100):
+        data.append(["time", "open", "high" , "low", x])
+    res = ta.SMA(data, size=10, index=50)
+    print(res)
+    print(len(res))
+    # print(len(hist))
