@@ -63,7 +63,13 @@ if __name__ == "__main__":
     data = []
     for x in range(100):
         data.append(["time", "open", "high" , "low", x])
-    res = ta.SMA(data, size=10, index=50)
+    # res = ta.singleSMA(hist, 50)
+    # print(res)
+    res = ta.EMA(hist, 10, size=50)
     print(res)
-    print(len(res))
+    for x ,y in zip(res, hist[-50:]):
+        if x <  float(y[4]): print("below")
+        else: print("above")
+    # print(hist[-1][4])
+    # print(len(res))
     # print(len(hist))
