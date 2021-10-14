@@ -42,12 +42,12 @@ def singleEMA(data : list[list], smoothing : int = 2, window : int = 9, index : 
 def EMA(data : list[list] , smoothing : int = 2, size : int = None, window : int = 9, index : int = None, use : int = 4) -> list:
     if not index : index = len(data)
     if not size: size = len(data) - window
-    ema = []
-    lastEma = None
-    for i in range(index - size, index):
-        lastEma = singleEMA(data, smoothing, window, i, use, lastEma)
-        ema.append(lastEma)
-    return ema
+    def gen(lastEma = None): 
+        for i in range(index - size, index):
+            lastEma = singleEMA(data, smoothing, window, i, use, lastEma)
+            yield lastEma
+    return list(gen())
+        
     
 
 

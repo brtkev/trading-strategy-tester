@@ -65,8 +65,8 @@ if __name__ == "__main__":
         data.append(["time", "open", "high" , "low", x])
     # res = ta.singleSMA(hist, 50)
     # print(res)
-    res = ta.EMA(hist, 10, size=50)
-    print(res)
+    res = ta.EMA(hist, 10, size=50, window=50)
+    # print(res)
     for x ,y in zip(res, hist[-50:]):
         if x <  float(y[4]): print("below")
         else: print("above")
