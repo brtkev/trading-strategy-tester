@@ -9,22 +9,6 @@ def loadData(file : str) -> list:
         data = json.loads(f.write())
     return data
 
-
-
-
-# def gather_data(currency, symbols_list, interval, start, end):
-#     if symbols_list:
-#         client = Client("", "", { "timeout" : 20})
-#         try:
-#             os.makedirs(f"instance.db/historial/{currency}/{interval}/{start.replace(' ', '_')}-{end.replace(' ', '_')}")
-#         except FileExistsError:
-#             pass
-
-#         for symbol in symbols_list:
-#             if symbol != currency:
-#                 get_historial(client, currency, symbol, interval, start, end)
-
-
     
 def dayMonthYearTime(date : str):
     return int(time.mktime(time.strptime(date, "%d %b %Y")))
@@ -35,11 +19,13 @@ def yearTime(year : str):
 def fetchHistorial(props):
     """{ symbol : str, interval : str, startTime: int, endTime: int }"""
     import binanceWrapper as binance
-
+    props["startTime"] = 1000 * props["startTime"]
+    props["endTime"] = 1000 * props["endTime"]
     klines = []
     while props["startTime"] < props["endTime"]:
-        klines.extend(binance.symbolKlines(props["symbol"], props["interval"], 1000, props["startTime"] * 1000))
-        props["startTime"] += 60 * 60 * 1000
+        print("getting ", props["startTime"])
+        klines.extend(binance.symbolKlines(props["symbol"], props["interval"], 1000, props["startTime"]))
+        props["startTime"] = klines[-1][0]
     return list(filterDups(klines))
 
 def writeHistorial(path : str, historial : list[list]):
@@ -56,17 +42,19 @@ def writeHistorial(path : str, historial : list[list]):
 
 def readHistorial(path) -> list[list]:
     with open(path ,"r") as f:
-            return json.loads(f.read())    
+        return json.loads(f.read())    
 
 def getHistorial(props : dict) -> list[list]:
     """{ symbol : str, interval : str, startTime: int, endTime: int }"""
-    path = f"historial/{props['symbol']}/{props['interval']}/{props['endTime']}.json"
+    startText = time.strftime("%Y %b %d", time.gmtime(props['startTime']))
+    endText = time.strftime("%Y %b %d", time.gmtime(props['endTime']))
+    path = f"historial/{props['symbol']}/{props['interval']}/{startText} to {endText}.json"
     try:
         historial = readHistorial(path)
+        return historial
     except (FileNotFoundError):
         historial = fetchHistorial(props)
         writeHistorial(path, historial)
-    finally:
         return historial
     
 

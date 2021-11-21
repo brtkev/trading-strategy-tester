@@ -54,31 +54,16 @@ def trades_analitics():
 
 import sys, time, json
 
-import binanceWrapper
 
 if __name__ == "__main__":
-    # do()
     from tradingTest import utils, technicalAnalisys as ta, TradingTest
-    # hist = utils.getHistorial({"symbol" : "BTCUSDT", "interval" : "1h", "startTime" : utils.yearTime("2010"), "endTime" : utils.dayMonthYearTime("1 jul 2021")})
-    # data = []
-    # for x in range(100):
-    #     data.append(["time", "open", "high" , "low", x])
-    # res = ta.singleSMA(hist, 50)
-    # print(res)
-    # res = ta.EMA(hist, 10, size=50, window=50)
-    # print(res)
-    # for x ,y in zip(res, hist[-50:]):
-    #     if x <  float(y[4]): print("below")
-    #     else: print("above")
-    # print(hist[-1][4])
-    # print(len(res))
-    # print(len(hist))
-
-    # res =  ta.ATR(hist, 10)
-    # print(res)
-    # print(len(res))
-    
+    end = utils.dayMonthYearTime("21 nov 2021")
+    now = time.time()
+    props = {"symbol" : "ETHUSDT", "interval" : "5m", "startTime" : utils.yearTime("2010"), "endTime" : end}
     tester = TradingTest()
-    tester.test({"symbol" : "BTCUSDT", "interval" : "1h", "startTime" : utils.yearTime("2010"), "endTime" : utils.dayMonthYearTime("1 jul 2021")})
+    tester.test(props)
     
-    print(tester.tradeAnalytics())
+    analytics = tester.tradeAnalytics()
+    # print()
+    # for x in analytics:
+    #     print(x, analytics[x])

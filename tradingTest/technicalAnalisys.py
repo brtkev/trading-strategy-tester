@@ -60,6 +60,56 @@ def ATR(data : list[list], size : int = None, window : int = 14,  index : int = 
     return [ singleATR(data, window, i) for i in range(index - size, index)]
 
 
+def SMMA(data : list[list] , size : int = None, window : int = 9, index : int = None, use : int = 4) -> list:
+    if not index : index = len(data)
+    if not size: size = len(data) - window
+    def getSMMA(): 
+        current = singleSMA(data, window, index-size, use)
+        for i in range(index - size, index):
+            yield current
+            current = ((current * window) - current + float(data[i][use]))/ window
+        yield current
+    return list(getSMMA())
 
+def averageWinLose(data : list[list], _from : int , _to : int):
+    count = wAvg = lAvg = 0
+    for i in range(_from, _to):
+        _open  = float(data[i][1])
+        close = float(data[i][4])
+        if _open < close:
+            wAvg += percentChange(_open, close)
+        else:
+            lAvg += percentChange(close, _open)
+        count += 1
+    res = {
+        'avgWin' : wAvg/count,
+        'avgLose' : lAvg/count,
+    }
+    
+    return res
 
+def RSI(data : list[list], size : int = None, window : int = 21, index : int = None):
+    if not index : index = len(data)
+    if not size: size = len(data) - window
+    def getRSI(): 
+        currentAvgWL = averageWinLose(data, index - size - window, index - size)
+        current = 100 - (100 / (1 + (currentAvgWL['avgWin']/currentAvgWL['avgLose'])))
+        for i in range(index - size + 1, index):
+            yield current
+            lastAvgWL = currentAvgWL
+            currentAvgWL = averageWinLose(data, i-window, i)
+            current = 100 - (100 / (1 + ((((lastAvgWL['avgWin']*window-1) + currentAvgWL['avgWin']*window)/ window) / (((lastAvgWL['avgLose']*window-1) + currentAvgWL['avgLose']*window)/ window))))
+        yield current
+    return list(getRSI())
 
+def lastHigh(data : list[list], index: int = None):
+    if not index : index = len(data)-1
+    for i in range(index-1, 0, -1):
+        if float(data[i][2]) > float(data[i+1][2]) and float(data[i][2]) > float(data[i-1][2]):
+            return float(data[i][2])
+
+def lastLow(data : list[list], index: int = None):
+    if not index : index = len(data)-1
+    for i in range(index-1, 0, -1):
+        if float(data[i][3]) < float(data[i+1][3]) and float(data[i][3]) < float(data[i-1][3]):
+            return float(data[i][3])

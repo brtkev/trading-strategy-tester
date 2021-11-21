@@ -1,4 +1,6 @@
 from os import close, truncate
+
+from app import trades_analitics
 from . import utils, strategy, technicalAnalisys as ta
 
 
@@ -12,81 +14,90 @@ class TradingTest():
         import time
         # get symbol data
         data = utils.getHistorial(props)
+
+        print("len ", len(data))
         print(time.strftime("%Y %b %d", time.gmtime(data[0][0]/1000)))
 
-            
+        strat = strategy.EthScalp
+        strat.setup(data)
+        
+
+        self.dataLen = len(data)
         # iterate over data
-        oc = cc = nc = 0
         for i in range(201, len(data)):
             
             #if onTrade get exit validity
             if self.position:
                 #if valid exit
-                if strategy.One.close(self.position, data, i):
-                    self.trades.append(self.close(data, i))
+                shouldClose = strat.close(self.position, data, i)
+                if shouldClose:
+                    self.position.update(shouldClose)
+                    self.trades.append(self.position)
                     self.position = None
 
 
             #if not onTrade get trade validity
             if not self.position:
                 #if valid enter trade
-                side = strategy.One.open(data, i)
+                side = strat.open(data, i)
                 if side:
                     self.position = self.open(data, i, side)
 
+        self.strat = strat
+
     def open(self, data, index, side):
+        if type(side) == dict:
+            side['index'] = index
+            side['bar'] = data[index]
+            return side
+            
         return {
             'bar' : data[index],
             'index' : index,
             'side' : side
         }
 
-    def close(self, data, index):
-        self.position.update({
-            'outIndex' : index,
-            'outBar' : data[index],
-        })
-        return self.position
-
-    def tradeAnalytics(self):
-        import time
-
+    def tradeAnalytics(self):        
         
-        analytics = {
-            'percentChange' : 0,
-            'gain' : 0,
-            'riskFactor' : 3,
-            'cap' : 100,
-            'nextDouble' : 200,
-            'timesDouble' : 0,
-            'lowestCap' : 100,
-            'highestCap' : 0,
-            'biggestLose' : 0,
-            'biggestWin' : 0,
-        }
-        
-        for trade in self.trades:
-            val = float(trade['bar'][4])
-            outVal = float(trade['outBar'][4])
-            if trade['side'] == 'LONG':
-                perChange = ta.percentChange(val, outVal)
-            else:
-                perChange = ta.percentChange(outVal, val)
+        def iterateTrades():
+            currWinningStreak = currLosingStreak = 0
+            for trade in self.trades:
+                TradesAnalisys.count += 1
+                closeP = float(trade['bar'][4])
 
-            analytics['cap'] += analytics['cap'] * analytics['riskFactor'] * (perChange / 100)
+                if trade['status'] == 'win':
+                    TradesAnalisys.wins += 1
+                    TradesAnalisys.gain += 2
 
-            if analytics['cap'] > analytics['nextDouble']:
-                print(f"{analytics['nextDouble']} day : ", time.strftime("%Y %b %d", time.gmtime(trade['bar'][0]/1000)))
-                analytics['timesDouble'] += 1
-                analytics['nextDouble'] *= 2
+                    currLosingStreak = 0
+                    currWinningStreak += 1
+                else:
+                    TradesAnalisys.loses += 1
+                    TradesAnalisys.gain -= 1
 
-            if perChange > analytics['biggestWin'] : analytics['biggestWin'] = perChange
-            elif perChange < analytics['biggestLose'] : analytics['biggestLose'] = perChange
+                    currLosingStreak += 1
+                    currWinningStreak = 0
 
-            if analytics['cap'] > analytics['highestCap']: analytics['highestCap'] = analytics['cap']
-            elif analytics['cap'] < analytics['lowestCap']: analytics['lowestCap'] = analytics['cap']
+                if TradesAnalisys.losingStreak < currLosingStreak:
+                    TradesAnalisys.losingStreak = currLosingStreak
+                if TradesAnalisys.winningStreak < currWinningStreak:
+                    TradesAnalisys.winningStreak = currWinningStreak
 
-            analytics['percentChange'] += perChange
-        analytics['avgPercentChange'] = analytics['percentChange'] / len(self.trades)
-        analytics['avgCapGain'] = (analytics['cap']-100) / len(self.trades)
-        return analytics
+        iterateTrades()
+        print("count", TradesAnalisys.count)
+        print("wins", TradesAnalisys.wins)
+        print("loses", TradesAnalisys.loses)
+        print("gain", TradesAnalisys.gain)
+        print("winrate", TradesAnalisys.wins/TradesAnalisys.count)
+        print()
+        print("biggest winning streak", TradesAnalisys.winningStreak)
+        print("biggest losing streak", TradesAnalisys.losingStreak)
+
+class TradesAnalisys:
+    count = 0
+    wins = 0
+    loses = 0
+    change = 0
+    gain  = 0
+    losingStreak = 0
+    winningStreak = 0
