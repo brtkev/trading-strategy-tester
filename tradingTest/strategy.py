@@ -99,4 +99,106 @@ class EthScalp():
                     'price' : position['sl'],
                     'closeIndex' : index
                 }
+
+
+
+class rideLong():
+
+    trades = []
+    position = None
+
+    @classmethod
+    def setup(cls, data):
+        window = 100
+        cls.SMA50 = [0 for i in range(window)]
+        cls.SMA50.extend(ta.SMA(data, window=window))
+        cls.ATR = [0 for i in range(14)]
+        cls.ATR.extend(ta.ATR(data))
+
+    @classmethod
+    def shouldOpen(cls, index, data):
+
+        close = float(data[index][4])
+        if close > cls.SMA50[index-1] + cls.ATR[index-1] * 2:
+            cls.position = {
+                'entry' : close,
+                'entryIndex': index,
+            }
+
+    @classmethod
+    def shouldClose(cls, index, data):
+        close = float(data[index][4])
+        if close < cls.SMA50[index-1] - cls.ATR[index-1] * 2:
+            cls.position.update({
+                'exit' : close,
+                'exitIndex' : index
+            })
+            cls.trades.append(cls.position)
+            cls.position = None
+
+    @classmethod
+    def getStats(cls, dataLen):
+        account = 100
+        wins = loses = count = fees = avgCandles = net = 0
+        currLosingStreak = currWinningStreak = losingStreak = winningStreak = biggestWin = biggestLoss = 0
+        netArray = []
+        for trade in cls.trades:
+            count += 1
+            tradeSize = account
+            fees += tradeSize * 0.2 / 100
+            avgCandles += trade['exitIndex'] - trade['entryIndex']
+
+            entry = trade['entry']
+            exit = trade['exit']
+            if trade['entry'] < trade['exit']:
+                wins += 1
+                percentChange = ta.percentChange(entry, exit)
+                profit = account * percentChange/100
+                net += profit
+                account += profit
+
+                if percentChange > biggestWin:
+                    biggestWin = percentChange
+
+                currLosingStreak = 0
+                currWinningStreak += 1
+            else:
+                loses += 1
+                percentChange = ta.percentChange(exit, entry)
+                lose = account * percentChange/100
+                net -= lose
+                account -= lose
+
+                if percentChange > biggestLoss:
+                    biggestLoss = percentChange
+
+                currLosingStreak += 1
+                currWinningStreak = 0
+
+            if losingStreak < currLosingStreak:
+                losingStreak = currLosingStreak
+            if winningStreak < currWinningStreak:
+                winningStreak = currWinningStreak
+            
+            netArray.append(net)
+
+        avgCandles /= count
         
+        return
+        import json
+        with open('stats.json', 'a') as f:
+            f.write(json.dumps({
+                'wins' : wins,
+                'loses' : loses,
+                'count' : count,
+                'net' : net,
+                'fees' : fees,
+                'avgCandles' : avgCandles,
+                'dataLen' : dataLen,
+                'losingStreak' : losingStreak,
+                'winningStreak' : winningStreak,
+                'biggestLoss' : biggestLoss,
+                'biggestWin' : biggestWin
+
+
+            }, indent=4))

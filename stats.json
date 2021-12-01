@@ -1,0 +1,53 @@
+{
+    "name" : "50 sma ride ethusdt",
+    "wins": 98,
+    "loses": 140,
+    "count": 238,
+    "net": 4397.84546379765,
+    "fees": 428.8040731287171,
+    "avgCandles": 83.3655462184874,
+    "dataLen": 37497,
+    "losingStreak": 7,
+    "winningStreak": 5,
+    "biggestLoss": 20.416428435296357,
+    "biggestWin": 63.82634603107046
+}{
+    "name" : "100 sma ride ethusdt",
+    "wins": 68,
+    "loses": 89,
+    "count": 157,
+    "net": 6489.986278438535,
+    "fees": 486.7843562040619,
+    "avgCandles": 124.89171974522293,
+    "dataLen": 37497,
+    "losingStreak": 5,
+    "winningStreak": 4,
+    "biggestLoss": 12.103589743589744,
+    "biggestWin": 77.09877137266224
+}{
+    "name" : "100 sma ride BTCUSDT",
+    "wins": 65,
+    "loses": 99,
+    "count": 164,
+    "net": 1190.727408004572,
+    "fees": 149.46710671981654,
+    "avgCandles": 125.11585365853658,
+    "dataLen": 37498,
+    "losingStreak": 7,
+    "winningStreak": 6,
+    "biggestLoss": 17.30071473587853,
+    "biggestWin": 57.31006825057041
+}{
+    "name" : "50 sma ride BTCUSDT",
+    "wins": 94,
+    "loses": 134,
+    "count": 228,
+    "net": 2722.7944593151897,
+    "fees": 392.7047304761506,
+    "avgCandles": 87.62719298245614,
+    "dataLen": 37498,
+    "losingStreak": 7,
+    "winningStreak": 6,
+    "biggestLoss": 23.363499781639778,
+    "biggestWin": 39.40544619835231
+}

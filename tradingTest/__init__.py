@@ -18,9 +18,16 @@ class TradingTest():
         print("len ", len(data))
         print(time.strftime("%Y %b %d", time.gmtime(data[0][0]/1000)))
 
-        strat = strategy.EthScalp
+        strat = strategy.rideLong
         strat.setup(data)
-        
+        for i in range( 201, len(data)):
+            if strat.position:
+                strat.shouldClose(i, data)
+            else:
+                strat.shouldOpen(i, data)
+
+        strat.getStats(len(data))
+        return
 
         self.dataLen = len(data)
         # iterate over data

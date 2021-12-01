@@ -54,16 +54,21 @@ def trades_analitics():
 
 import sys, time, json
 
+from tradingTest import strategy
+import binanceWrapper as binance
+
 
 if __name__ == "__main__":
     from tradingTest import utils, technicalAnalisys as ta, TradingTest
+    # strategy.rideLong.setup(binance.symbolKlines('BTCUSDT', '1h'))
+    # exit()
     end = utils.dayMonthYearTime("21 nov 2021")
     now = time.time()
     props = {"symbol" : "ETHUSDT", "interval" : "1h", "startTime" : utils.yearTime("2010"), "endTime" : end}
     tester = TradingTest()
     tester.test(props)
     
-    analytics = tester.tradeAnalytics()
+    # analytics = tester.tradeAnalytics()
     # print()
     # for x in analytics:
     #     print(x, analytics[x])
