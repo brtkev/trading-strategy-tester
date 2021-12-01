@@ -59,7 +59,7 @@ if __name__ == "__main__":
     from tradingTest import utils, technicalAnalisys as ta, TradingTest
     end = utils.dayMonthYearTime("21 nov 2021")
     now = time.time()
-    props = {"symbol" : "ETHUSDT", "interval" : "5m", "startTime" : utils.yearTime("2010"), "endTime" : end}
+    props = {"symbol" : "ETHUSDT", "interval" : "1h", "startTime" : utils.yearTime("2010"), "endTime" : end}
     tester = TradingTest()
     tester.test(props)
     

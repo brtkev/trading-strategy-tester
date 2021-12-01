@@ -113,3 +113,8 @@ def lastLow(data : list[list], index: int = None):
     for i in range(index-1, 0, -1):
         if float(data[i][3]) < float(data[i+1][3]) and float(data[i][3]) < float(data[i-1][3]):
             return float(data[i][3])
+
+def qtyToTrade(capital : float, entry: float,  stopLoss :float , risk : float = 1):
+    riskCap = capital * risk
+    pc = abs(percentChange(entry, stopLoss))
+    return riskCap / pc

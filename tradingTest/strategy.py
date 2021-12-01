@@ -68,13 +68,15 @@ class EthScalp():
 
     @classmethod
     def open(cls, data, index):
+        closePrice = float(data[index][4])
         if cls.SMMA20[index-20] >  cls.SMMA200[index - 200]:
-            if cls.RSI[index - 21] >= 51 and float(data[index][4]) > cls.SMMA20[index-20]:
+            if cls.RSI[index - 21] >= 51 and closePrice > cls.SMMA20[index-20]:
                 for x in data[index-3:index+1]:
                     if float(x[3]) < cls.SMMA20[index-20]:
                         sl = ta.lastLow(data, index)
                         sl = sl - sl * 0.001
-                        tp = float(data[index][4]) + ((float(data[index][4]) - sl) * 2)
+                        tp = closePrice + ((closePrice - sl) * 2)
+                        # if ta.percentChange(sl, closePrice) < 1: return
                         return {
                             'side' : 'BUY',
                             'sl' : sl,
@@ -88,11 +90,13 @@ class EthScalp():
             if float(data[index][2]) > position['tp']:
                 return {
                     'status' : 'win',
-                    'price' : position['tp'] 
+                    'price' : position['tp'],
+                    'closeIndex' : index
                 }
             elif float(data[index][3]) < position['sl']:
                 return {
                     'status' : 'loss',
-                    'price' : position['sl'] 
+                    'price' : position['sl'],
+                    'closeIndex' : index
                 }
         
